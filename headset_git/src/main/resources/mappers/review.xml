@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="review">
+	<select id="list"
+		resultType="com.example.headset.model.review.ReviewDTO">
+		SELECT r.r_idx,r_title,r_text,r_filename,r_date,r_viewcount,r.m_id,r_state,
+		(SELECT COUNT(*) FROM review_reply re, review r WHERE re.r_idx=r.r_idx) cnt
+		from review r, MEMBER m
+		<include refid="search" />
+		ORDER BY r.r_idx DESC, r.r_date DESC
+		LIMIT #{start}, 10
+	</select>
+	
+	<select id="list_product"
+		resultType="com.example.headset.model.review.Review_ProductDTO">
+		SELECT p.p_code ,p_name, p_price,p_sound,p_wear,p_design,((p_sound+p_wear+p_design)/3) p_point, (select count(*) from review r) cnt, (select count(*) from review WHERE p_code=1) cnt_product, p_image
+		FROM product p LEFT join product_satisfaction ps
+		on p.p_code = ps.p_code
+		LIMIT #{start}, 9;
+	</select>
+
+	<select id="list_sel_product"
+		resultType="com.example.headset.model.review.ReviewDTO">
+		SELECT r.r_idx,r_title,r_text,r_filename,r_date,r_viewcount,r.m_id,r_state,
+		(SELECT COUNT(*) FROM review_reply re, review r WHERE re.r_idx=r.r_idx) cnt
+		from review r, MEMBER m
+		<include refid="search" />
+		<include refid="search_sel_product" />
+		ORDER BY r.r_idx DESC, r.r_date DESC
+		LIMIT #{start}, 10
+	</select>
+	
+
+	<insert id="insert">
+		insert into review (p_code,r_title,b_idx,m_id,r_text,r_filename) values
+		('test_1',#{r_title},#{r_idx},#{m_id},#{r_text},#{r_filename})
+	</insert>
+
+<select id="detail"
+		resultType="com.example.headset.model.review.ReviewDTO">
+		select r_idx,r_title,r_text,r_filename,r_date,r_viewcount,r.m_id,r_state
+		from review r, member m
+		where r.m_id=m.m_id and r_idx=#{r_idx}
+</select>
+
+<update id="increase_r_viewcount">
+update review set r_viewcount=r_viewcount+1 where r_idx=#{r_idx}
+</update>
+<update id="update">
+	update review set r_title=#{r_title}, r_text=#{r_text}
+	where r_idx=#{r_idx}
+</update>
+
+<delete id="delete">
+	delete from review where r_idx=#{r_idx}
+</delete>
+
+<update id="sort">
+	UPDATE review set r_idx =(r_idx-1) where r_idx >= #{r_idx};
+</update>
+
+	<select id="count" resultType="int">
+		select count(*) from review r, member m
+		<include refid="search" />
+	</select>
+	
+	<select id="count_all" resultType="int">
+		select count(*) from review r
+	</select>
+	
+	
+	
+	<select id="list_r_attach" resultType="String">
+		select r_filename from r_attach
+		where r_idx=#{r_idx} order by r_date
+	</select>
+	
+	<insert id="insert_r_attach">
+		insert into attach (r_filename, r_idx) values
+		(#{r_filename}, ifnull((select max(r_idx)+1 from r_attach),1)
+	</insert>
+	<insert id="update_r_attach">
+		insert into r_attach (r_filename, r_idx)
+ 		values (#{r_filename}, #{r_idx} )
+	</insert>
+	
+	
+	<sql id="search">
+		<choose>
+			<when test="search_option == 'all' ">
+				where r.m_id=m.m_id
+				and (r.m_id like CONCAT('%',#{keyword},'%')
+				or r_text like CONCAT( '%',#{keyword}, '%')
+				or r_title LIKE CONCAT('%',#{keyword},'%')
+				)
+			</when>
+			<otherwise>
+				where r.m_id=m.m_id
+				and ${search_option} like CONCAT('%',#{keyword},'%')
+			</otherwise>
+		</choose>
+	</sql>
+	
+	<sql id="search_sel_product">
+				and r.p_code=#{p_code}
+	</sql>
+	
+
+
+
+</mapper>

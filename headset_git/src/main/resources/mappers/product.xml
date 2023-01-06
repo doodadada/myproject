@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="product">
+	<select id="list"
+	resultType="com.example.headset.model.product.ProductDTO">
+	select * from product
+	</select>
+	
+	<select id="sel"
+	resultType="com.example.headset.model.product.ProductDTO">
+	select * from product where p_name=#{p_name}
+	</select>
+	<select id="sel_code"
+	resultType="com.example.headset.model.product.ProductDTO">
+	select * from product where p_code=#{p_code}
+	</select>
+</mapper>

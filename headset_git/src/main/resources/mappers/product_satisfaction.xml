@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="product_satisfaction">
+	<select id="list"
+	resultType="com.example.headset.model.product.Product_SatisfactionDTO">
+	select * from product_satisfaction
+	</select>
+	
+	<select id="sel"
+	resultType="com.example.headset.model.product.Product_SatisfactionDTO">
+	select * from product_satisfaction where 
+	</select>
+</mapper>
